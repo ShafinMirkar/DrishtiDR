@@ -1,0 +1,5 @@
+/home/shafin/Desktop/Projects/DrishtiDx/build/CMakeFiles/DrishtiDx.dir
+/home/shafin/Desktop/Projects/DrishtiDx/build/CMakeFiles/edit_cache.dir
+/home/shafin/Desktop/Projects/DrishtiDx/build/CMakeFiles/rebuild_cache.dir
+/home/shafin/Desktop/Projects/DrishtiDx/build/CMakeFiles/DrishtiDx_autogen_timestamp_deps.dir
+/home/shafin/Desktop/Projects/DrishtiDx/build/CMakeFiles/DrishtiDx_autogen.dir
