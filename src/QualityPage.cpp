@@ -1,13 +1,15 @@
 #include "QualityPage.h"
 
+#include <QFileDialog>
 #include <QFileInfo>
+#include <QFrame>
 #include <QHBoxLayout>
 #include <QImage>
 #include <QLabel>
 #include <QPixmap>
 #include <QPushButton>
+#include <QSizePolicy>
 #include <QVBoxLayout>
-#include <QFrame>
 
 QualityPage::QualityPage(
     const PatientData &patient,
@@ -20,77 +22,141 @@ QualityPage::QualityPage(
     setAutoFillBackground(true);
 
     setupUI();
-    evaluateQuality();
 }
+
 void QualityPage::setupUI()
 {
     setStyleSheet(
         "QWidget {"
-        "background: #FFFFFF;"
+        "background-color: #FFFFFF;"
         "color: #243746;"
-        "font-family: Sans Serif;"
+        "font-family: Arial;"
         "}"
+
         "QLabel {"
-        "background: transparent;"
         "color: #243746;"
         "}"
+
+        "QFrame {"
+        "background-color: #F7F9FA;"
+        "border:none;"
+        "}"
+
         "QPushButton {"
+        "background-color: #123B5D;"
+        "color: #FFFFFF;"
+        "border: none;"
+        "border-radius: 5px;"
+        "padding: 9px 18px;"
         "font-size: 14px;"
         "font-weight: 600;"
+        "}"
+
+        "QPushButton:hover {"
+        "background-color: #174C73;"
+        "}"
+
+        "QPushButton:disabled {"
+        "background-color: #B8C4CB;"
+        "color: #FFFFFF;"
+        "}"
+
+        "QLabel#title {"
+        "font-size: 23px;"
+        "font-weight: 700;"
+        "color: #123B5D;"
+        "}"
+
+        "QLabel#subtitle {"
+        "font-size: 14px;"
+        "color: #637887;"
+        "}"
+
+        "QLabel#patientContext {"
+        "background-color: #F3F6F8;"
+        "border: none"
+        "background: transparent;"
+        "padding: 8px 10px;"
+        "font-size: 13px;"
+        "font-weight: 600;"
+        "color: #34454F;"
+        "}"
+
+        "QLabel#workflow {"
+        "font-size: 13px;"
+        "font-weight: 600;"
+        "color: #087F9C;"
+        "}"
+
+        "QLabel#sectionTitle {"
+        "font-size: 15px;"
+        "font-weight: 700;"
+        "color: #34454F;"
+        "}"
+
+        "QLabel#imageCaption {"
+        "font-size: 13px;"
+        "font-weight: 700;"
+        "color: #526773;"
+        "}"
+
+        "QLabel#metric {"
+        "background-color: #FFFFFF;"
+        "border: none;"
+"background: transparent;"
+        "padding: 9px;"
+        "font-size: 14px;"
+        "}"
+
+        "QLabel#check {"
+        "font-size: 14px;"
+        "color: #2F6F3E;"
+        "}"
+
+        "QLabel#status {"
+        "background-color: #E8F6EC;"
+        "border: 1px solid #B8DEC2;"
+        "border-radius: 5px;"
+        "padding: 10px;"
+        "font-size: 14px;"
+        "font-weight: 600;"
+        "color: #237238;"
         "}"
     );
 
     auto *mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(36, 24, 36, 24);
+    mainLayout->setContentsMargins(32, 24, 32, 20);
     mainLayout->setSpacing(12);
 
     // -------------------------------------------------
-    // Page title
+    // Header
     // -------------------------------------------------
 
     auto *title = new QLabel("Image Quality Assessment");
-
-    title->setStyleSheet(
-        "font-size: 25px;"
-        "font-weight: bold;"
-        "color: #123B5D;"
-    );
-
-    mainLayout->addWidget(title);
+    title->setObjectName("title");
 
     auto *subtitle = new QLabel(
         "Assessment of focus, illumination and retinal field of view"
     );
+    subtitle->setObjectName("subtitle");
 
-    subtitle->setStyleSheet(
-        "font-size: 14px;"
-        "color: #60717D;"
-    );
-
+    mainLayout->addWidget(title);
     mainLayout->addWidget(subtitle);
 
     // -------------------------------------------------
     // Patient context
     // -------------------------------------------------
 
-    patientContextLabel = new QLabel;
-
-    patientContextLabel->setText(
-        "Patient: " + patient.patientId +
-        "   |   Name: " + patient.name +
-        "   |   Age: " + patient.age +
-        "   |   " + patient.eye
+    patientContextLabel = new QLabel(
+        QString("Patient: %1   |   Name: %2   |   Age: %3   |   %4")
+            .arg(patient.patientId)
+            .arg(patient.name)
+            .arg(patient.age)
+            .arg(patient.eye)
     );
 
-    patientContextLabel->setStyleSheet(
-        "background: #F4F7F9;"
-        "border: 1px solid #D9E2E8;"
-        "border-radius: 5px;"
-        "padding: 9px 12px;"
-        "font-size: 13px;"
-        "font-weight: 600;"
-        "color: #34454F;"
-    );
+    patientContextLabel->setObjectName("patientContext");
+    patientContextLabel->setMinimumHeight(34);
 
     mainLayout->addWidget(patientContextLabel);
 
@@ -102,12 +168,7 @@ void QualityPage::setupUI()
         "Patient  →  Image  →  [ QUALITY ]  →  Analysis  →  Result  →  Report"
     );
 
-    workflowLabel->setStyleSheet(
-        "font-size: 13px;"
-        "font-weight: bold;"
-        "color: #167D8D;"
-        "padding: 4px 0;"
-    );
+    workflowLabel->setObjectName("workflow");
 
     mainLayout->addWidget(workflowLabel);
 
@@ -115,244 +176,209 @@ void QualityPage::setupUI()
     // Main content
     // -------------------------------------------------
 
-    auto *content = new QHBoxLayout;
-    content->setSpacing(20);
+    auto *contentLayout = new QHBoxLayout;
+    contentLayout->setSpacing(18);
 
     // -------------------------------------------------
-    // Image section
+    // Original image panel
     // -------------------------------------------------
 
-    auto *imageArea = new QHBoxLayout;
-    imageArea->setSpacing(12);
-
-    // Original image
-    auto *originalContainer = new QVBoxLayout;
-
-    auto *originalCaption = new QLabel("ORIGINAL IMAGE");
-    originalCaption->setAlignment(Qt::AlignCenter);
-    originalCaption->setStyleSheet(
-        "font-size: 13px;"
-        "font-weight: bold;"
-        "color: #52636D;"
+    auto *imageFrame = new QFrame;
+    imageFrame->setSizePolicy(
+        QSizePolicy::Expanding,
+        QSizePolicy::Expanding
     );
+
+    auto *imageLayout = new QVBoxLayout(imageFrame);
+    imageLayout->setContentsMargins(14, 14, 14, 14);
+    imageLayout->setSpacing(8);
+
+    auto *imageCaption = new QLabel("ORIGINAL FUNDUS IMAGE");
+    imageCaption->setObjectName("imageCaption");
+
+    imageLayout->addWidget(imageCaption);
 
     originalImage = new QLabel;
-    originalImage->setFixedSize(430, 360);
     originalImage->setAlignment(Qt::AlignCenter);
+    originalImage->setMinimumSize(450, 360);
+    originalImage->setSizePolicy(
+        QSizePolicy::Expanding,
+        QSizePolicy::Expanding
+    );
     originalImage->setStyleSheet(
-        "background: #F8FAFB;"
-        "border: 1px solid #D9E2E8;"
-        "border-radius: 7px;"
-    );
-
-    QPixmap pixmap(patient.imagePath);
-
-    originalImage->setPixmap(
-    pixmap.scaled(
-        410,
-        340,
-            Qt::KeepAspectRatio,
-            Qt::SmoothTransformation
-        )
-    );
-
-    originalContainer->addWidget(originalCaption);
-    originalContainer->addWidget(originalImage, 1);
-
-    imageArea->addLayout(originalContainer, 1);
-
-    // Enhanced image
-    auto *enhancedContainer = new QVBoxLayout;
-
-    enhancedCaption = new QLabel("ENHANCED IMAGE");
-    enhancedCaption->setAlignment(Qt::AlignCenter);
-    enhancedCaption->setStyleSheet(
-        "font-size: 13px;"
-        "font-weight: bold;"
-        "color: #52636D;"
-    );
-
-    enhancedImage = new QLabel;
-    enhancedImage->setFixedSize(430, 360);
-    enhancedImage->setAlignment(Qt::AlignCenter);
-    enhancedImage->setStyleSheet(
-        "background: #F8FAFB;"
-        "border: 1px solid #D9E2E8;"
-        "border-radius: 7px;"
-    );
-
-    enhancedContainer->addWidget(enhancedCaption);
-    enhancedContainer->addWidget(enhancedImage, 1);
-
-    imageArea->addLayout(enhancedContainer, 1);
-
-    // Hide enhanced section until enhancement actually exists.
-    enhancedImage->hide();
-    enhancedCaption->hide();
-
-    content->addLayout(imageArea, 2);
-
-    // -------------------------------------------------
-    // Quality details
-    // -------------------------------------------------
-
-    auto *detailsFrame = new QFrame;
-
-    detailsFrame->setStyleSheet(
-        "QFrame {"
-        "background: #F8FAFB;"
-        "border: 1px solid #D9E2E8;"
-        "border-radius: 7px;"
+        "QLabel {"
+        "background-color: #FFFFFF;"
+        "border: none;"
+"background: transparent;"
         "}"
     );
 
-    auto *details = new QVBoxLayout(detailsFrame);
-    details->setContentsMargins(18, 18, 18, 18);
-    details->setSpacing(10);
+    QImage image(patient.imagePath);
 
-    statusLabel = new QLabel;
-    qualityLabel = new QLabel;
-    focusLabel = new QLabel;
-    illuminationLabel = new QLabel;
-    fieldLabel = new QLabel;
-    enhancementInfo = new QLabel;
+    if (!image.isNull())
+    {
+        QPixmap pixmap = QPixmap::fromImage(image);
 
-    statusLabel->setStyleSheet(
-        "font-size: 20px;"
-        "font-weight: bold;"
-        "color: #238636;"
-        "padding-bottom: 5px;"
-    );
-
-    for (auto *label :
-         {qualityLabel, focusLabel, illuminationLabel, fieldLabel}) {
-
-        label->setStyleSheet(
-            "font-size: 14px;"
-            "color: #34454F;"
-            "padding: 4px 0;"
+        originalImage->setPixmap(
+            pixmap.scaled(
+                520,
+                400,
+                Qt::KeepAspectRatio,
+                Qt::SmoothTransformation
+            )
         );
     }
+    else
+    {
+        originalImage->setText("Unable to load image");
+    }
 
-    enhancementInfo->setWordWrap(true);
-    enhancementInfo->setStyleSheet(
-        "font-size: 13px;"
-        "color: #52636D;"
-        "padding-top: 8px;"
+    imageLayout->addWidget(originalImage, 1);
+
+    // -------------------------------------------------
+    // Quality information panel
+    // -------------------------------------------------
+
+    auto *qualityFrame = new QFrame;
+    qualityFrame->setMinimumWidth(430);
+    qualityFrame->setMaximumWidth(520);
+
+    auto *qualityLayout = new QVBoxLayout(qualityFrame);
+    qualityLayout->setContentsMargins(16, 14, 16, 14);
+    qualityLayout->setSpacing(8);
+
+    statusLabel = new QLabel("IMAGE QUALITY: ACCEPTABLE");
+    statusLabel->setObjectName("status");
+    statusLabel->setStyleSheet(
+    "font-size: 17px;"
+    "font-weight: 700;"
+    "color: #167D8D;"
+    "border: none;"
+    "background: transparent;"
+);
+
+    qualityLayout->addWidget(statusLabel);
+
+    auto *qualityTitle = new QLabel("Quality Metrics");
+    qualityTitle->setObjectName("sectionTitle");
+
+    qualityLayout->addWidget(qualityTitle);
+
+    focusLabel = new QLabel(
+        QString("Focus: %1")
+            .arg(patient.focusScore, 0, 'f', 4)
     );
 
-    details->addWidget(statusLabel);
-    details->addWidget(qualityLabel);
-    details->addWidget(focusLabel);
-    details->addWidget(illuminationLabel);
-    details->addWidget(fieldLabel);
+    brightnessLabel = new QLabel(
+        QString("Brightness: %1")
+            .arg(patient.brightnessScore, 0, 'f', 4)
+    );
 
-    details->addSpacing(8);
+    contrastLabel = new QLabel(
+        QString("Contrast: %1")
+            .arg(patient.contrastScore, 0, 'f', 4)
+    );
 
-    details->addWidget(enhancementInfo);
-    details->addStretch();
+    fovLabel = new QLabel(
+        QString("FOV: %1")
+            .arg(patient.fovScore, 0, 'f', 4)
+    );
 
-    content->addWidget(detailsFrame, 1);
+    illuminationLabel = new QLabel(
+        QString("Illumination: %1")
+            .arg(patient.illuminationScore, 0, 'f', 4)
+    );
 
-    mainLayout->addLayout(content);
+    QLabel *metrics[] = {
+        focusLabel,
+        brightnessLabel,
+        contrastLabel,
+        fovLabel,
+        illuminationLabel
+    };
+
+    for (auto *label : metrics)
+    {
+        label->setObjectName("metric");
+        qualityLayout->addWidget(label);
+    }
+
+    auto *checksTitle = new QLabel("Quality Checks");
+    checksTitle->setObjectName("sectionTitle");
+
+    qualityLayout->addSpacing(5);
+    qualityLayout->addWidget(checksTitle);
+
+    focusCheckLabel = new QLabel("✓ Focus");
+    brightnessCheckLabel = new QLabel("✓ Brightness");
+    contrastCheckLabel = new QLabel("✓ Contrast");
+    fovCheckLabel = new QLabel("✓ FOV");
+    illuminationCheckLabel = new QLabel("✓ Illumination");
+
+    QLabel *checks[] = {
+        focusCheckLabel,
+        brightnessCheckLabel,
+        contrastCheckLabel,
+        fovCheckLabel,
+        illuminationCheckLabel
+    };
+
+    for (auto *label : checks)
+    {
+        label->setObjectName("check");
+        qualityLayout->addWidget(label);
+    }
+
+    qualityLayout->addStretch();
+
+    contentLayout->addWidget(imageFrame, 3);
+    contentLayout->addWidget(qualityFrame, 2);
+
+    mainLayout->addLayout(contentLayout, 1);
 
     // -------------------------------------------------
     // Bottom action bar
     // -------------------------------------------------
 
-    auto *actionBar = new QFrame;
-
-    actionBar->setStyleSheet(
-        "QFrame {"
-        "background: #F4F7F9;"
-        "border: 1px solid #D9E2E8;"
-        "border-radius: 7px;"
-        "}"
+    auto *actionFrame = new QFrame;
+    actionFrame->setSizePolicy(
+        QSizePolicy::Preferred,
+        QSizePolicy::Fixed
     );
 
-    auto *actions = new QHBoxLayout(actionBar);
-    actions->setContentsMargins(12, 10, 12, 10);
-    actions->setSpacing(10);
+    auto *actionLayout = new QHBoxLayout(actionFrame);
+    actionLayout->setContentsMargins(10, 8, 10, 8);
 
-    nextButton = new QPushButton("Next");
-    enhanceButton = new QPushButton("Enhance");
-    rejectButton = new QPushButton("Reject");
-    uploadAnotherButton = new QPushButton("Upload Another Image");
+    uploadAnotherButton =
+        new QPushButton("Upload Another Image");
 
-    for (auto *button :
-         {nextButton, enhanceButton, rejectButton, uploadAnotherButton}) {
+    rejectButton =
+        new QPushButton("Reject");
 
-        button->setMinimumHeight(40);
-        button->setCursor(Qt::PointingHandCursor);
-    }
-
-    nextButton->setStyleSheet(
-        "QPushButton {"
-        "background: #123B5D;"
-        "color: white;"
-        "border: none;"
-        "border-radius: 5px;"
-        "padding: 8px 24px;"
-        "}"
-        "QPushButton:hover {"
-        "background: #0E304A;"
-        "}"
-        "QPushButton:disabled {"
-        "background: #CBD5DA;"
-        "color: #7A878E;"
-        "}"
-    );
-
-    enhanceButton->setStyleSheet(
-        "QPushButton {"
-        "background: #167D8D;"
-        "color: white;"
-        "border: none;"
-        "border-radius: 5px;"
-        "padding: 8px 24px;"
-        "}"
-        "QPushButton:hover {"
-        "background: #126B78;"
-        "}"
-        "QPushButton:disabled {"
-        "background: #CBD5DA;"
-        "color: #7A878E;"
-        "}"
-    );
+    nextButton =
+        new QPushButton("Next");
 
     rejectButton->setStyleSheet(
         "QPushButton {"
-        "background: white;"
-        "color: #B42318;"
-        "border: 1px solid #D5A5A1;"
+        "background-color: #FFFFFF;"
+        "color: #B23A3A;"
+        "border: 1px solid #D99A9A;"
         "border-radius: 5px;"
-        "padding: 8px 20px;"
+        "padding: 9px 18px;"
+        "font-size: 14px;"
+        "font-weight: 600;"
         "}"
         "QPushButton:hover {"
-        "background: #FFF5F4;"
+        "background-color: #FFF5F5;"
         "}"
     );
 
-    uploadAnotherButton->setStyleSheet(
-        "QPushButton {"
-        "background: white;"
-        "color: #123B5D;"
-        "border: 1px solid #BFCBD2;"
-        "border-radius: 5px;"
-        "padding: 8px 20px;"
-        "}"
-        "QPushButton:hover {"
-        "background: #F4F7F9;"
-        "}"
-    );
+    actionLayout->addWidget(uploadAnotherButton);
+    actionLayout->addWidget(rejectButton);
+    actionLayout->addStretch();
+    actionLayout->addWidget(nextButton);
 
-    actions->addWidget(uploadAnotherButton);
-    actions->addWidget(rejectButton);
-    actions->addStretch();
-    actions->addWidget(enhanceButton);
-    actions->addWidget(nextButton);
-
-    mainLayout->addWidget(actionBar);
+    mainLayout->addWidget(actionFrame);
 
     // -------------------------------------------------
     // Connections
@@ -366,13 +392,6 @@ void QualityPage::setupUI()
     );
 
     connect(
-        enhanceButton,
-        &QPushButton::clicked,
-        this,
-        &QualityPage::enhanceImage
-    );
-
-    connect(
         rejectButton,
         &QPushButton::clicked,
         this,
@@ -383,180 +402,39 @@ void QualityPage::setupUI()
         uploadAnotherButton,
         &QPushButton::clicked,
         this,
-        &QualityPage::rejectImage
+        &QualityPage::uploadAnotherImage
     );
 }
 
-void QualityPage::evaluateQuality()
+void QualityPage::uploadAnotherImage()
 {
-    QString filename =
-        QFileInfo(patient.imagePath).fileName().toLower();
-
-    if (filename.contains("poor")) {
-
-        statusLabel->setText("UNGRADABLE");
-
-        statusLabel->setStyleSheet(
-            "font-size: 20px;"
-            "font-weight: bold;"
-            "color: #B42318;"
-        );
-
-        qualityLabel->setText("Overall Quality: 28%");
-        focusLabel->setText("Focus: Poor");
-        illuminationLabel->setText("Illumination: Poor");
-        fieldLabel->setText("Field of View: Inadequate");
-
-        enhancementInfo->setText(
-            "This image cannot be reliably assessed.\n\n"
-            "Please recapture the fundus image or upload another image."
-        );
-
-        enhancementInfo->setStyleSheet(
-            "font-size: 13px;"
-            "color: #B42318;"
-        );
-
-        nextButton->setEnabled(false);
-        enhanceButton->setEnabled(false);
-
-        return;
-    }
-
-    if (filename.contains("borderline")) {
-
-        statusLabel->setText("BORDERLINE");
-
-        statusLabel->setStyleSheet(
-            "font-size: 20px;"
-            "font-weight: bold;"
-            "color: #B7791F;"
-        );
-
-        qualityLabel->setText("Overall Quality: 67%");
-        focusLabel->setText("Focus: Borderline");
-        illuminationLabel->setText("Illumination: Uneven");
-        fieldLabel->setText("Field of View: Adequate");
-
-        enhancementInfo->setText(
-            "Borderline image detected.\n"
-            "Automatic enhancement has been applied."
-        );
-
-        enhancementInfo->setStyleSheet(
-            "font-size: 13px;"
-            "color: #8A6116;"
-        );
-
-        nextButton->setEnabled(false);
-        enhanceButton->setEnabled(false);
-
-        applySimulatedEnhancement();
-
-        return;
-    }
-
-    statusLabel->setText("GOOD");
-
-    statusLabel->setStyleSheet(
-        "font-size: 20px;"
-        "font-weight: bold;"
-        "color: #238636;"
+    QString path = QFileDialog::getOpenFileName(
+        this,
+        "Select Fundus Image",
+        QString(),
+        "Images (*.png *.jpg *.jpeg *.bmp *.tif *.tiff)"
     );
 
-    qualityLabel->setText("Overall Quality: 91%");
-    focusLabel->setText("Focus: Good");
-    illuminationLabel->setText("Illumination: Good");
-    fieldLabel->setText("Field of View: Good");
-
-    enhancementInfo->setText(
-        "Image is suitable for analysis.\n"
-        "You may continue, enhance, or reject the image."
-    );
-
-    enhancementInfo->setStyleSheet(
-        "font-size: 13px;"
-        "color: #238636;"
-    );
-
-    nextButton->setEnabled(true);
-    enhanceButton->setEnabled(true);
-}
-
-void QualityPage::applySimulatedEnhancement()
-{
-    QImage original(patient.imagePath);
-
-    if (original.isNull())
+    if (path.isEmpty())
         return;
 
-    QImage enhanced =
-        original.convertToFormat(QImage::Format_RGB32);
+    QImage image(path);
 
-    for (int y = 0; y < enhanced.height(); ++y) {
+    if (image.isNull())
+        return;
 
-        QRgb *line =
-            reinterpret_cast<QRgb *>(enhanced.scanLine(y));
+    patient.imagePath = path;
 
-        for (int x = 0; x < enhanced.width(); ++x) {
-
-            int r = qRed(line[x]);
-            int g = qGreen(line[x]);
-            int b = qBlue(line[x]);
-
-            r = qBound(0, (r - 128) * 12 / 10 + 128, 255);
-            g = qBound(0, (g - 128) * 12 / 10 + 128, 255);
-            b = qBound(0, (b - 128) * 12 / 10 + 128, 255);
-
-            line[x] = qRgb(r, g, b);
-        }
-    }
-
-    enhancedImage->setPixmap(
-        QPixmap::fromImage(enhanced).scaled(
-            430,
-            380,
+    originalImage->setPixmap(
+        QPixmap::fromImage(image).scaled(
+            520,
+            400,
             Qt::KeepAspectRatio,
             Qt::SmoothTransformation
         )
     );
 
-    // Show enhanced panel only after enhancement exists.
-    enhancedCaption->show();
-    enhancedImage->show();
-
-    statusLabel->setText("ENHANCED");
-
-    statusLabel->setStyleSheet(
-        "font-size: 20px;"
-        "font-weight: bold;"
-        "color: #167D8D;"
-    );
-
-    qualityLabel->setText("Enhanced Quality: 94%");
-    focusLabel->setText("Focus: Acceptable");
-    illuminationLabel->setText("Illumination: Normalized");
-    fieldLabel->setText("Field of View: Good");
-
-    enhancementInfo->setText(
-        "Enhancement applied:\n"
-        "✓ Contrast enhancement\n"
-        "✓ Illumination normalization\n"
-        "✓ Noise reduction"
-    );
-
-    enhancementInfo->setStyleSheet(
-        "font-size: 13px;"
-        "color: #167D8D;"
-    );
-
     nextButton->setEnabled(true);
-}
-
-void QualityPage::enhanceImage()
-{
-    applySimulatedEnhancement();
-    enhanceButton->setEnabled(false);
 }
 
 void QualityPage::rejectImage()

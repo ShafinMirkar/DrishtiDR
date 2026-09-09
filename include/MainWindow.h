@@ -9,6 +9,8 @@ class QLineEdit;
 class QComboBox;
 class QLabel;
 class QPushButton;
+class QTabWidget;
+class QListWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -33,9 +35,16 @@ private:
     QLabel *imageNameLabel;
     QPushButton *nextButton;
 
+    QTabWidget *mainTabs;
+    QListWidget *reportsList;
+
     QString selectedImagePath;
 
     void setupUI();
+    void setupReportsTab();
+    void refreshReports();
+    void openSelectedReport();
+
     PatientData collectPatientData();
 };
 

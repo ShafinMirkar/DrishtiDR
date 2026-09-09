@@ -23,7 +23,7 @@ signals:
     void backRequested();
 
 private slots:
-    void enhanceImage();
+    void uploadAnotherImage();
     void rejectImage();
 
 private:
@@ -33,24 +33,25 @@ private:
     QLabel *workflowLabel;
 
     QLabel *originalImage;
-    QLabel *enhancedImage;
-    QLabel *enhancedCaption;
 
     QLabel *statusLabel;
-    QLabel *qualityLabel;
     QLabel *focusLabel;
+    QLabel *brightnessLabel;
+    QLabel *contrastLabel;
+    QLabel *fovLabel;
     QLabel *illuminationLabel;
-    QLabel *fieldLabel;
-    QLabel *enhancementInfo;
+
+    QLabel *focusCheckLabel;
+    QLabel *brightnessCheckLabel;
+    QLabel *contrastCheckLabel;
+    QLabel *fovCheckLabel;
+    QLabel *illuminationCheckLabel;
 
     QPushButton *nextButton;
-    QPushButton *enhanceButton;
     QPushButton *rejectButton;
     QPushButton *uploadAnotherButton;
 
     void setupUI();
-    void evaluateQuality();
-    void applySimulatedEnhancement();
 };
 
 #endif

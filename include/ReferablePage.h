@@ -1,5 +1,5 @@
-#ifndef REPORTPAGE_H
-#define REPORTPAGE_H
+#ifndef REFERABLEPAGE_H
+#define REFERABLEPAGE_H
 
 #include "AppData.h"
 
@@ -8,33 +8,32 @@
 class QLabel;
 class QPushButton;
 
-class ReportPage : public QWidget
+class ReferablePage : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit ReportPage(
+    explicit ReferablePage(
         const PatientData &patient,
         QWidget *parent = nullptr
     );
 
 signals:
-    void backToMainRequested();
-
-private slots:
-    void generatePDF();
+    void assessmentCompleted();
 
 private:
     PatientData patient;
 
     QLabel *patientContextLabel;
     QLabel *workflowLabel;
-    QLabel *reportNumberLabel;
-    QLabel *reportInfo;
-    QLabel *statusLabel;
 
-    QPushButton *generateButton;
-    QPushButton *backButton;
+    QLabel *probabilityLabel;
+    QLabel *thresholdLabel;
+    QLabel *decisionLabel;
+    QLabel *statusLabel;
+    QLabel *recommendationLabel;
+
+    QPushButton *nextButton;
 
     void setupUI();
 };

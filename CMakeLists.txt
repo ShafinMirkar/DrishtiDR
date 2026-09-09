@@ -28,6 +28,18 @@ add_executable(DrishtiDx
     include/ReportPage.h
 
     include/AppData.h
+
+    src/CataractPage.cpp
+include/CataractPage.h
+
+    src/PreprocessingPage.cpp
+include/PreprocessingPage.h
+
+    src/ReferablePage.cpp
+include/ReferablePage.h
+
+    src/ExplainabilityPage.cpp
+include/ExplainabilityPage.h
 )
 
 target_include_directories(DrishtiDx PRIVATE

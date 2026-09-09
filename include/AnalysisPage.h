@@ -6,9 +6,7 @@
 #include <QWidget>
 
 class QLabel;
-class QProgressBar;
 class QPushButton;
-class QTimer;
 
 class AnalysisPage : public QWidget
 {
@@ -29,20 +27,19 @@ private:
     QLabel *patientContextLabel;
     QLabel *workflowLabel;
 
-    QLabel *statusLabel;
-    QLabel *stepLabel;
-    QLabel *stepsLabel;
+    QLabel *gradeLabel;
+    QLabel *severityLabel;
+    QLabel *confidenceLabel;
 
-    QProgressBar *progressBar;
-    QPushButton *resultButton;
+    QLabel *noDrProbabilityLabel;
+    QLabel *mildProbabilityLabel;
+    QLabel *moderateProbabilityLabel;
+    QLabel *severeProbabilityLabel;
+    QLabel *proliferativeProbabilityLabel;
 
-    QTimer *timer;
-
-    int progress;
-    int currentStep;
+    QPushButton *nextButton;
 
     void setupUI();
-    void updateAnalysis();
 };
 
 #endif
