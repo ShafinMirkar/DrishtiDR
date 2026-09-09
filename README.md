@@ -69,11 +69,6 @@ git clone https://github.com/ShafinMirkar/DrishtiDR.git
 cd DrishtiDR
 ```
 
-### 3. Create Reports Directory
-
-```bash
-mkdir -p reports
-```
 
 ### 4. Configure the Project
 
@@ -138,11 +133,6 @@ git clone https://github.com/ShafinMirkar/DrishtiDR.git
 cd DrishtiDR
 ```
 
-### 5. Create Reports Directory
-
-```bash
-mkdir -p reports
-```
 
 ### 6. Configure the Project
 
