@@ -114,7 +114,7 @@ void MainWindow::setupUI()
     // Header
     // ---------------------------------------------------------
 
-    auto *title = new QLabel("DrishtiDx");
+    auto *title = new QLabel("DrishtiDR");
 
     title->setStyleSheet(
         "font-size: 30px;"
